@@ -58,14 +58,15 @@ function PokemonInfo({pokemonName}) {
     //   2. pokemonName but no pokemon: <PokemonInfoFallback name={pokemonName} />
     //   3. pokemon: <PokemonDataView pokemon={pokemon} />
 
-    if(status === 'idle') {
+    if (status === 'idle') {
         return <div>Submit a pokemon</div>
-    } else if(status === 'pending') {
+    } else if (status === 'pending') {
         return <PokemonInfoFallback name={pokemonName}/>
-    } else if(status === 'resolved') {
+    } else if (status === 'resolved') {
         return <PokemonDataView pokemon={pokemon}/>
-    } else if(status === 'rejected') {
-        return <ErrorMessage message={errorMessage}/>
+    } else if (status === 'rejected') {
+        // return <ErrorMessage message={errorMessage}/>
+        throw new Error(errorMessage)
     }
 
 }
@@ -76,6 +77,29 @@ export const ErrorMessage = ({message = ''}) => {
             There was an error: <pre style={{whiteSpace: 'normal'}}>{message}</pre>
         </div>
     )
+}
+
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            hasError: false,
+            errorDetails: null
+        }
+    }
+
+    static getDerivedStateFromError(error) {
+        console.log(error)
+        return {hasError: true, errorDetails: error}
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <this.props.ErrorComponent message={this.state.errorDetails.toString()}/>
+        }
+
+        return this.props.children;
+    }
 }
 
 function App() {
@@ -90,7 +114,9 @@ function App() {
             <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit}/>
             <hr/>
             <div className="pokemon-info">
-                <PokemonInfo pokemonName={pokemonName}/>
+                <ErrorBoundary ErrorComponent={ErrorMessage}>
+                    <PokemonInfo pokemonName={pokemonName}/>
+                </ErrorBoundary>
             </div>
         </div>
     )
