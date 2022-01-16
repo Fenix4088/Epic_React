@@ -8,6 +8,7 @@ import * as React from 'react'
 // PokemonDataView: the stuff we use to display the pokemon info
 import {fetchPokemon, PokemonDataView, PokemonForm, PokemonInfoFallback} from '../pokemon'
 import {useEffect} from "react";
+import {ErrorBoundary} from "react-error-boundary";
 
 export const useGetPokemon = (pokemonName = '') => {
     const [pokemon, setPokemon] = React.useState({pokemon: null, fetchingStatus: 'idle', errorMessage: ''});
@@ -79,7 +80,8 @@ export const ErrorMessage = ({message = ''}) => {
     )
 }
 
-class ErrorBoundary extends React.Component {
+//! Native react error boundary component
+/*class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -100,6 +102,17 @@ class ErrorBoundary extends React.Component {
 
         return this.props.children;
     }
+}*/
+
+//! for react-error-boundary package
+function ErrorFallback({error, resetErrorBoundary}) {
+    return (
+        <div role="alert">
+            <p>Something went wrong:</p>
+            <pre>{error.message}</pre>
+            <button onClick={resetErrorBoundary}>Try again</button>
+        </div>
+    )
 }
 
 function App() {
@@ -114,7 +127,7 @@ function App() {
             <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit}/>
             <hr/>
             <div className="pokemon-info">
-                <ErrorBoundary key={pokemonName} ErrorComponent={ErrorMessage}>
+                <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => setPokemonName('')}>
                     <PokemonInfo pokemonName={pokemonName}/>
                 </ErrorBoundary>
             </div>
