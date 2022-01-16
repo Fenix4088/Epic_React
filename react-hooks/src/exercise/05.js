@@ -36,7 +36,6 @@ function Tilt({children}) {
             glare: true,
             'max-glare': .5
         })
-        console.dir(tiltNode)
         return () => tiltNode.vanillaTilt.destroy();
     }, [])
 
