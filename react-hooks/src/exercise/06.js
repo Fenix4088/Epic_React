@@ -9,10 +9,48 @@ import * as React from 'react'
 import {fetchPokemon, PokemonDataView, PokemonForm, PokemonInfoFallback} from '../pokemon'
 import {useEffect} from "react";
 
-function PokemonInfo({pokemonName}) {
-    // 🐨 Have state for the pokemon (null)
+/*
+    idle: no request made yet
+    pending: request started
+    resolved: request successful
+    rejected: request failed
+*/
+
+export const useGetPokemon = (pokemonName = '') => {
+    const [status, setStatus] = React.useState('idle');
     const [pokemon, setPokemon] = React.useState(null);
     const [errorMessage, setErrorMessage] = React.useState('');
+
+    useEffect(() => {
+        if (!pokemonName) return;
+        setPokemon(null);
+        setErrorMessage('');
+        setStatus('pending');
+
+        fetchPokemon(pokemonName)
+            .then(pokemonInfo => {
+                setPokemon(pokemonInfo);
+                setStatus('resolved');
+            })
+            .catch(error => {
+                setErrorMessage(error.message);
+                setStatus('rejected');
+            })
+
+    }, [pokemonName])
+
+    return {
+        pokemon,
+        status,
+        errorMessage
+    }
+}
+
+function PokemonInfo({pokemonName}) {
+    // 🐨 Have state for the pokemon (null)
+
+    const {pokemon, status, errorMessage} = useGetPokemon(pokemonName);
+
     // 🐨 use React.useEffect where the callback should be called whenever the
     // pokemon name changes.
     // 💰 DON'T FORGET THE DEPENDENCIES ARRAY!
@@ -23,39 +61,22 @@ function PokemonInfo({pokemonName}) {
     //     pokemonData => {/* update all the state here */},
     //   )
 
-    useEffect(() => {
-        if (!pokemonName) return;
-        setPokemon(null);
-        setErrorMessage('');
-        fetchPokemon(pokemonName)
-            .then(pokemonInfo => setPokemon(pokemonInfo))
-            .catch(error => setErrorMessage(error.message))
-
-    }, [pokemonName])
 
     // 🐨 return the following things based on the `pokemon` state and `pokemonName` prop:
     //   1. no pokemonName: 'Submit a pokemon'
     //   2. pokemonName but no pokemon: <PokemonInfoFallback name={pokemonName} />
     //   3. pokemon: <PokemonDataView pokemon={pokemon} />
 
-
-    if (errorMessage) return <ErrorMessage message={errorMessage}/>
-
-    if (pokemon) {
-        return <PokemonDataView pokemon={pokemon}/>
-    } else {
+    if(status === 'idle') {
+        return <div>Submit a pokemon</div>
+    } else if(status === 'pending') {
         return <PokemonInfoFallback name={pokemonName}/>
+    } else if(status === 'resolved') {
+        return <PokemonDataView pokemon={pokemon}/>
+    } else if(status === 'rejected') {
+        return <ErrorMessage message={errorMessage}/>
     }
 
-    // return <>
-    //     {
-    //         if(pokemon) {
-    //             return <PokemonDataView pokemon={pokemon}/>
-    //     } else if(!pokemon && !errormessagw) {}
-    //     }
-    //
-    //     {pokemon ? <PokemonDataView pokemon={pokemon}/> : <PokemonInfoFallback name={pokemonName}/>}
-    // </>
 }
 
 export const ErrorMessage = ({message = ''}) => {
