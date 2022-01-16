@@ -9,35 +9,22 @@ import * as React from 'react'
 import {fetchPokemon, PokemonDataView, PokemonForm, PokemonInfoFallback} from '../pokemon'
 import {useEffect} from "react";
 
-/*
-    idle: no request made yet
-    pending: request started
-    resolved: request successful
-    rejected: request failed
-*/
-
 export const useGetPokemon = (pokemonName = '') => {
-    // const [status, setStatus] = React.useState('idle');
-    const [pokemon, setPokemon] = React.useState({pokemon: null, fetchingStatus: 'idle'});
+    const [pokemon, setPokemon] = React.useState({pokemon: null, fetchingStatus: 'idle', errorMessage: ''});
 
-    const [errorMessage, setErrorMessage] = React.useState('');
+    // const [errorMessage, setErrorMessage] = React.useState('');
 
     useEffect(() => {
         if (!pokemonName) return;
-        setPokemon({pokemon: null, fetchingStatus: 'pending'});
-        setErrorMessage('');
-        // setStatus('pending');
+        setPokemon({pokemon: null, fetchingStatus: 'pending', errorMessage: ''});
+        // setErrorMessage('');
 
         fetchPokemon(pokemonName)
             .then(pokemonInfo => {
-                // setPokemon(pokemonInfo);
-                // setStatus('resolved');
-                setPokemon({pokemon: pokemonInfo, fetchingStatus: 'resolved'});
+                setPokemon({pokemon: pokemonInfo, fetchingStatus: 'resolved', errorMessage: ''});
             })
             .catch(error => {
-                setErrorMessage(error.message);
-                // setStatus('rejected');
-                setPokemon({pokemon: null, fetchingStatus: 'rejected'});
+                setPokemon({pokemon: null, fetchingStatus: 'rejected', errorMessage: error.message});
 
             })
 
@@ -46,7 +33,7 @@ export const useGetPokemon = (pokemonName = '') => {
     return {
         pokemon: pokemon.pokemon,
         status: pokemon.fetchingStatus,
-        errorMessage
+        errorMessage: pokemon.errorMessage
     }
 }
 
