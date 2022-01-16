@@ -13,12 +13,9 @@ import {ErrorBoundary} from "react-error-boundary";
 export const useGetPokemon = (pokemonName = '') => {
     const [pokemon, setPokemon] = React.useState({pokemon: null, fetchingStatus: 'idle', errorMessage: ''});
 
-    // const [errorMessage, setErrorMessage] = React.useState('');
-
     useEffect(() => {
         if (!pokemonName) return;
         setPokemon({pokemon: null, fetchingStatus: 'pending', errorMessage: ''});
-        // setErrorMessage('');
 
         fetchPokemon(pokemonName)
             .then(pokemonInfo => {
