@@ -24,7 +24,7 @@ function PokemonInfo({pokemonName}) {
 
     useEffect(() => {
         if (!pokemonName) return;
-
+        setPokemon(null);
         fetchPokemon(pokemonName).then(pokemonInfo => setPokemon(pokemonInfo))
 
     }, [pokemonName])
