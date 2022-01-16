@@ -12,6 +12,7 @@ import {useEffect} from "react";
 function PokemonInfo({pokemonName}) {
     // 🐨 Have state for the pokemon (null)
     const [pokemon, setPokemon] = React.useState(null);
+    const [errorMessage, setErrorMessage] = React.useState('');
     // 🐨 use React.useEffect where the callback should be called whenever the
     // pokemon name changes.
     // 💰 DON'T FORGET THE DEPENDENCIES ARRAY!
@@ -25,7 +26,10 @@ function PokemonInfo({pokemonName}) {
     useEffect(() => {
         if (!pokemonName) return;
         setPokemon(null);
-        fetchPokemon(pokemonName).then(pokemonInfo => setPokemon(pokemonInfo))
+        setErrorMessage('');
+        fetchPokemon(pokemonName)
+            .then(pokemonInfo => setPokemon(pokemonInfo))
+            .catch(error => setErrorMessage(error.message))
 
     }, [pokemonName])
 
@@ -34,10 +38,32 @@ function PokemonInfo({pokemonName}) {
     //   2. pokemonName but no pokemon: <PokemonInfoFallback name={pokemonName} />
     //   3. pokemon: <PokemonDataView pokemon={pokemon} />
 
-    return <>
 
-        {!!pokemon ? <PokemonDataView pokemon={pokemon}/> : <PokemonInfoFallback name={pokemonName}/>}
-    </>
+    if (errorMessage) return <ErrorMessage message={errorMessage}/>
+
+    if (pokemon) {
+        return <PokemonDataView pokemon={pokemon}/>
+    } else {
+        return <PokemonInfoFallback name={pokemonName}/>
+    }
+
+    // return <>
+    //     {
+    //         if(pokemon) {
+    //             return <PokemonDataView pokemon={pokemon}/>
+    //     } else if(!pokemon && !errormessagw) {}
+    //     }
+    //
+    //     {pokemon ? <PokemonDataView pokemon={pokemon}/> : <PokemonInfoFallback name={pokemonName}/>}
+    // </>
+}
+
+export const ErrorMessage = ({message = ''}) => {
+    return (
+        <div role="alert">
+            There was an error: <pre style={{whiteSpace: 'normal'}}>{message}</pre>
+        </div>
+    )
 }
 
 function App() {
