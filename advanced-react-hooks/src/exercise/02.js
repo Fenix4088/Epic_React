@@ -17,7 +17,7 @@ function pokemonInfoReducer(state, action) {
             return {status: 'pending', data: null, error: null}
         }
         case 'resolved': {
-            return {status: 'resolved', data: action.pokemon, error: null}
+            return {status: 'resolved', data: action.data, error: null}
         }
         case 'rejected': {
             return {status: 'rejected', data: null, error: action.error}
@@ -31,6 +31,7 @@ function pokemonInfoReducer(state, action) {
 
 export const useAsync = (asyncCallback, initialState = {}, dependencies = []) => {
     const [state, dispatch] = React.useReducer(pokemonInfoReducer, {
+        status: 'idle',
         data: null,
         error: null,
         ...initialState,
@@ -70,7 +71,7 @@ function PokemonInfo({pokemonName}) {
         return fetchPokemon(pokemonName)
     }, {status: pokemonName ? 'pending' : 'idle'}, [pokemonName])
 
-    
+
     const {data, status, error} = state
 
     switch (status) {
