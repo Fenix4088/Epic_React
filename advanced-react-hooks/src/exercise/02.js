@@ -37,13 +37,14 @@ export const useAsync = (asyncCallback, initialState = {}, dependencies = []) =>
         ...initialState,
     })
 
+    const memoizedRun = React.useCallback()
+
     React.useEffect(() => {
 
         const promise = asyncCallback()
         if (!promise) {
             return
         }
-
         if (!dependencies[0]) {
             return
         }
