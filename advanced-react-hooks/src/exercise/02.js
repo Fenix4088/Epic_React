@@ -29,7 +29,7 @@ function pokemonInfoReducer(state, action) {
 }
 
 
-export const useAsync = (asyncCallback, initialState = {}, dependencies = []) => {
+export const useAsync = (asyncCallback, initialState = {}) => {
     const [state, dispatch] = React.useReducer(pokemonInfoReducer, {
         status: 'idle',
         data: null,
@@ -37,17 +37,12 @@ export const useAsync = (asyncCallback, initialState = {}, dependencies = []) =>
         ...initialState,
     })
 
-    const memoizedRun = React.useCallback()
-
     React.useEffect(() => {
-
         const promise = asyncCallback()
         if (!promise) {
             return
         }
-        if (!dependencies[0]) {
-            return
-        }
+
         dispatch({type: 'pending'})
         promise.then(
             data => {
@@ -57,20 +52,21 @@ export const useAsync = (asyncCallback, initialState = {}, dependencies = []) =>
                 dispatch({type: 'rejected', error})
             },
         )
-// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, dependencies)
+    }, [asyncCallback])
 
     return state;
 }
 
 function PokemonInfo({pokemonName}) {
 
-    const state = useAsync(() => {
+    const asyncCallback = React.useCallback(() => {
         if (!pokemonName) {
             return
         }
         return fetchPokemon(pokemonName)
-    }, {status: pokemonName ? 'pending' : 'idle'}, [pokemonName])
+    }, [pokemonName])
+
+    const state = useAsync(asyncCallback, {status: pokemonName ? 'pending' : 'idle'})
 
 
     const {data, status, error} = state
