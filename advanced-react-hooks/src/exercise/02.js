@@ -54,20 +54,20 @@ export const useAsync = (initialState = {}) => {
 
     const safeDispatch = useSafeDispatch(dispatch)
 
-     const run = useCallback((promise) => {
-         if (!promise) {
-             return
-         }
+    const run = useCallback((promise) => {
+        if (!promise) {
+            return
+        }
 
-         safeDispatch({type: 'pending'})
-         promise.then(
-             data => {
-                 safeDispatch({type: 'resolved', data})
-             },
-             error => {
-                 safeDispatch({type: 'rejected', error})
-             },
-         )
+        safeDispatch({type: 'pending'})
+        promise.then(
+            data => {
+                safeDispatch({type: 'resolved', data})
+            },
+            error => {
+                safeDispatch({type: 'rejected', error})
+            },
+        )
     }, [])
 
     return {status: state.status, data: state.data, error: state.error, run};
@@ -75,19 +75,14 @@ export const useAsync = (initialState = {}) => {
 
 function PokemonInfo({pokemonName}) {
 
-    const {data, status, error, run} = useAsync( {status: pokemonName ? 'pending' : 'idle'})
+    const {data, status, error, run} = useAsync({status: pokemonName ? 'pending' : 'idle'})
 
     useEffect(() => {
-        console.log('Effect')
-        if(!pokemonName) return;
+        if (!pokemonName) return;
 
         run(fetchPokemon(pokemonName))
 
     }, [pokemonName])
-
-    useLayoutEffect(() => {
-        console.log('Layout')
-    }, [])
 
     switch (status) {
         case 'idle':
