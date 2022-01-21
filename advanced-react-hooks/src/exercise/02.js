@@ -9,6 +9,7 @@ import {
     PokemonInfoFallback,
     PokemonErrorBoundary,
 } from '../pokemon'
+import {useCallback, useEffect} from "react";
 
 // 🐨 this is going to be our generic asyncReducer
 function pokemonInfoReducer(state, action) {
@@ -29,7 +30,7 @@ function pokemonInfoReducer(state, action) {
 }
 
 
-export const useAsync = (asyncCallback, initialState = {}) => {
+export const useAsync = (initialState = {}) => {
     const [state, dispatch] = React.useReducer(pokemonInfoReducer, {
         status: 'idle',
         data: null,
@@ -37,39 +38,51 @@ export const useAsync = (asyncCallback, initialState = {}) => {
         ...initialState,
     })
 
-    React.useEffect(() => {
-        const promise = asyncCallback()
-        if (!promise) {
-            return
-        }
+    // React.useEffect(() => {
+    //     if (!promise) {
+    //         return
+    //     }
+    //
+    //     dispatch({type: 'pending'})
+    //     promise.then(
+    //         data => {
+    //             dispatch({type: 'resolved', data})
+    //         },
+    //         error => {
+    //             dispatch({type: 'rejected', error})
+    //         },
+    //     )
+    // }, [])
 
-        dispatch({type: 'pending'})
-        promise.then(
-            data => {
-                dispatch({type: 'resolved', data})
-            },
-            error => {
-                dispatch({type: 'rejected', error})
-            },
-        )
-    }, [asyncCallback])
+     const run = useCallback((promise) => {
+         if (!promise) {
+             return
+         }
 
-    return state;
+         dispatch({type: 'pending'})
+         promise.then(
+             data => {
+                 dispatch({type: 'resolved', data})
+             },
+             error => {
+                 dispatch({type: 'rejected', error})
+             },
+         )
+    }, [])
+
+    return {status: state.status, data: state.data, error: state.error, run};
 }
 
 function PokemonInfo({pokemonName}) {
 
-    const asyncCallback = React.useCallback(() => {
-        if (!pokemonName) {
-            return
-        }
-        return fetchPokemon(pokemonName)
+    const {data, status, error, run} = useAsync( {status: pokemonName ? 'pending' : 'idle'})
+
+    useEffect(() => {
+        if(!pokemonName) return;
+
+        run(fetchPokemon(pokemonName))
+
     }, [pokemonName])
-
-    const state = useAsync(asyncCallback, {status: pokemonName ? 'pending' : 'idle'})
-
-
-    const {data, status, error} = state
 
     switch (status) {
         case 'idle':
