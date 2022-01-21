@@ -9,7 +9,22 @@ import {
     PokemonInfoFallback,
     PokemonErrorBoundary,
 } from '../pokemon'
-import {useCallback, useEffect} from "react";
+import {useCallback, useEffect, useLayoutEffect} from "react";
+
+
+const useSafeDispatch = (dispatch) => {
+    const isMounted = React.useRef(false);
+
+    useLayoutEffect(() => {
+        isMounted.current = true;
+
+        return () => {
+            isMounted.current = false;
+        }
+    }, [])
+
+    return useCallback((...args) => isMounted.current ? dispatch(...args) : void 0, [dispatch])
+}
 
 // 🐨 this is going to be our generic asyncReducer
 function pokemonInfoReducer(state, action) {
@@ -29,7 +44,6 @@ function pokemonInfoReducer(state, action) {
     }
 }
 
-
 export const useAsync = (initialState = {}) => {
     const [state, dispatch] = React.useReducer(pokemonInfoReducer, {
         status: 'idle',
@@ -38,34 +52,20 @@ export const useAsync = (initialState = {}) => {
         ...initialState,
     })
 
-    // React.useEffect(() => {
-    //     if (!promise) {
-    //         return
-    //     }
-    //
-    //     dispatch({type: 'pending'})
-    //     promise.then(
-    //         data => {
-    //             dispatch({type: 'resolved', data})
-    //         },
-    //         error => {
-    //             dispatch({type: 'rejected', error})
-    //         },
-    //     )
-    // }, [])
+    const safeDispatch = useSafeDispatch(dispatch)
 
      const run = useCallback((promise) => {
          if (!promise) {
              return
          }
 
-         dispatch({type: 'pending'})
+         safeDispatch({type: 'pending'})
          promise.then(
              data => {
-                 dispatch({type: 'resolved', data})
+                 safeDispatch({type: 'resolved', data})
              },
              error => {
-                 dispatch({type: 'rejected', error})
+                 safeDispatch({type: 'rejected', error})
              },
          )
     }, [])
@@ -78,11 +78,16 @@ function PokemonInfo({pokemonName}) {
     const {data, status, error, run} = useAsync( {status: pokemonName ? 'pending' : 'idle'})
 
     useEffect(() => {
+        console.log('Effect')
         if(!pokemonName) return;
 
         run(fetchPokemon(pokemonName))
 
     }, [pokemonName])
+
+    useLayoutEffect(() => {
+        console.log('Layout')
+    }, [])
 
     switch (status) {
         case 'idle':
