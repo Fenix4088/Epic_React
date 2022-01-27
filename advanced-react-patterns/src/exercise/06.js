@@ -83,8 +83,6 @@ function useToggle({
   const toggle = () => dispatchWithOnChange({type: actionTypes.toggle})
   const reset = () => dispatchWithOnChange({type: actionTypes.reset, initialState})
 
-
-
   function getTogglerProps({onClick, ...props} = {}) {
     return {
       'aria-pressed': on,
