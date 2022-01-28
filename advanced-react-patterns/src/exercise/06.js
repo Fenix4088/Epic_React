@@ -3,6 +3,7 @@
 
 import * as React from 'react'
 import {Switch} from '../switch'
+import warning from "warning";
 
 const callAll =
     (...fns) =>
@@ -33,13 +34,18 @@ function useToggle({
                        reducer = toggleReducer,
                        on: controlledOn,
                        onChange,
-
+                       readOnly = false
                    } = {}) {
     const {current: initialState} = React.useRef({on: initialOn})
     const [state, dispatch] = React.useReducer(reducer, initialState)
 
     const onIsControlled = controlledOn != null
     const on = onIsControlled ? controlledOn : state.on
+    const hasOnChange = !!onChange;
+
+    React.useEffect(() => {
+        warning(!(!readOnly && !hasOnChange && onIsControlled), `Failed prop type: You provided a \`on\` prop to a form field without an \`onChange\` handler. This will render a read-only field. If the field should be mutable use \`defaultValue\`. Otherwise, set either \`onChange\` or \`readOnly\`.`)
+    }, [hasOnChange, onIsControlled, readOnly])
 
     const dispatchWithOnChange = (action) => {
         if (!onIsControlled) {
@@ -49,8 +55,6 @@ function useToggle({
         onChange && onChange(reducer({...state, on}, action), action);
 
     }
-
-    controlledOn && !onChange && console.warn(`Warning: Failed prop type: You provided a \`on\` prop to a form field without an \`onChange\` handler. This will render a read-only field. If the field should be mutable use \`defaultValue\`. Otherwise, set either \`onChange\` or \`readOnly\`.`)
 
     const toggle = () => dispatchWithOnChange({type: actionTypes.toggle})
     const reset = () => dispatchWithOnChange({type: actionTypes.reset, initialState})
@@ -66,6 +70,7 @@ function useToggle({
     function getResetterProps({onClick, ...props} = {}) {
         return {
             onClick: callAll(onClick, reset),
+            readOnly,
             ...props,
         }
     }
@@ -79,8 +84,10 @@ function useToggle({
     }
 }
 
-function Toggle({on: controlledOn, onChange}) {
-    const {on, getTogglerProps} = useToggle({on: controlledOn, onChange})
+function Toggle({
+                    on: controlledOn, onChange, readOnly,
+                }) {
+    const {on, getTogglerProps} = useToggle({on: controlledOn, onChange, readOnly})
     const props = getTogglerProps({on})
     return <Switch {...props} />
 }
