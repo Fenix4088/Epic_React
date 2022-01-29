@@ -3,12 +3,12 @@
 
 import * as React from 'react'
 
-let Globe = React.lazy(() => import('../globe'))
+let Globe = React.lazy(() => /* webpackPrefetch: true */import('../globe'))
 
 function App() {
   const [showGlobe, setShowGlobe] = React.useState(false);
 
-  const uploadGlobe = () => import('../globe');
+  const uploadGlobe = () => import(/* webpackPrefetch: true */'../globe');
 
   return (
     <div
