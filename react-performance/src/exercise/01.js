@@ -3,12 +3,12 @@
 
 import * as React from 'react'
 
-let Globe = React.lazy(() => /* webpackPrefetch: true */import('../globe'))
+// const uploadGlobe = () => import(/* webpackPrefetch: true */'../globe');
+let Globe = React.lazy(() => import(/* webpackPrefetch: true */'../globe'))
 
 function App() {
   const [showGlobe, setShowGlobe] = React.useState(false);
 
-  const uploadGlobe = () => import(/* webpackPrefetch: true */'../globe');
 
   return (
     <div
@@ -21,7 +21,7 @@ function App() {
         padding: '2rem',
       }}
     >
-      <label style={{marginBottom: '1rem'}} onMouseOver={uploadGlobe} onFocus={uploadGlobe}>
+      <label style={{marginBottom: '1rem'}} /*onMouseOver={uploadGlobe} onFocus={uploadGlobe}*/>
         <input
           type="checkbox"
           checked={showGlobe}
