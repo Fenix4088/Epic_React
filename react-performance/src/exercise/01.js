@@ -3,15 +3,13 @@
 
 import * as React from 'react'
 
-const Globe = React.lazy(() => import('../globe'))
+let Globe = React.lazy(() => import('../globe'))
 
 function App() {
-  const [showGlobe, setShowGlobe] = React.useState(false)
+  const [showGlobe, setShowGlobe] = React.useState(false);
 
-  // 🐨 wrap the code below in a <React.Suspense /> component
-  // with a fallback.
-  // 💰 try putting it in a few different places and observe how that
-  // impacts the user experience.
+  const uploadGlobe = () => import('../globe');
+
   return (
     <div
       style={{
@@ -23,7 +21,7 @@ function App() {
         padding: '2rem',
       }}
     >
-      <label style={{marginBottom: '1rem'}}>
+      <label style={{marginBottom: '1rem'}} onMouseOver={uploadGlobe} onFocus={uploadGlobe}>
         <input
           type="checkbox"
           checked={showGlobe}
