@@ -19,10 +19,12 @@ function Menu({
         <ListItem
           key={item.id}
           getItemProps={getItemProps}
+          isSelected={selectedItem?.id === item.id}
+          isHighlighted={highlightedIndex === index}
           item={item}
           index={index}
-          selectedItem={selectedItem}
-          highlightedIndex={highlightedIndex}
+          // selectedItem={selectedItem}
+          // highlightedIndex={highlightedIndex}
         >
           {item.name}
         </ListItem>
@@ -30,7 +32,8 @@ function Menu({
     </ul>
   )
 }
-Menu = React.memo(Menu);
+
+Menu = React.memo(Menu)
 
 function customCompare(prevProps, nextProps) {
   // true means do NOT rerender
@@ -57,12 +60,12 @@ function ListItem({
   getItemProps,
   item,
   index,
-  selectedItem,
-  highlightedIndex,
+  isSelected,
+  isHighlighted,
   ...props
 }) {
-  const isSelected = selectedItem?.id === item.id
-  const isHighlighted = highlightedIndex === index
+  // const isSelected = selectedItem?.id === item.id/
+  // const isHighlighted = highlightedIndex === index
   return (
     <li
       {...getItemProps({
@@ -78,7 +81,7 @@ function ListItem({
   )
 }
 
-ListItem = React.memo(ListItem, customCompare);
+ListItem = React.memo(ListItem /*, customCompare*/)
 
 function App() {
   const forceRerender = useForceRerender()
