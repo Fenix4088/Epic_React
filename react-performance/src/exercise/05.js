@@ -60,7 +60,7 @@ function useAppState() {
 function useAppDispatch() {
   const context = React.useContext(AppDispatchContext)
   if (!context) {
-    throw new Error('useAppState must be used within the AppProvider')
+    throw new Error('useAppDispatch must be used within the AppProvider')
   }
   return context
 }
@@ -84,9 +84,12 @@ function Grid() {
 
 Grid = React.memo(Grid)
 
+const useAppStateAndDispatch = () => [useAppState(), useAppDispatch()]
+
 function Cell({row, column}) {
-  const state = useAppState()
-  const dispatch = useAppDispatch()
+  const [state, dispatch] = useAppStateAndDispatch()
+  // const state = useAppState()
+  // const dispatch = useAppDispatch()
   const cell = state.grid[row][column]
   const handleClick = () => dispatch({type: 'UPDATE_GRID_CELL', row, column})
   return (
