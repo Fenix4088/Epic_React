@@ -10,7 +10,6 @@ import {
   updateGridState,
   updateGridCellState,
 } from '../utils'
-// 🐨 you're gonna need these:
 import {RecoilRoot, useRecoilState, useRecoilCallback, atomFamily} from 'recoil'
 
 const AppStateContext = React.createContext()
