@@ -17,7 +17,7 @@ const buildLoginForm = (overrides) => {
 
 test('submitting the form calls onSubmit with username and password', () => {
 
-  const {username, password} = buildLoginForm()
+  const {username, password} = buildLoginForm({password: '123'})
 
   const handleSubmit = jest.fn();
 
