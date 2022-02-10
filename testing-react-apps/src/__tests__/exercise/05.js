@@ -58,3 +58,16 @@ test(`logging in displays the user's username`, async () => {
 
   expect(screen.getByText(username)).toBeVisible();
 })
+
+test(`omitting the password results in an error`, async () => {
+  render(<Login />)
+  const {username} = buildLoginForm()
+
+  userEvent.type(screen.getByLabelText(/username/i), username)
+
+  userEvent.click(screen.getByRole('button', {name: /submit/i}))
+
+  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i)).then(() => console.log('Element no longer in DOM')).catch((err) => console.log(err))
+
+  expect(screen.getByRole(/alert/g)).toHaveTextContent('password required');
+})
