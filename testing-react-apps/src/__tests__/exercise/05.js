@@ -69,5 +69,5 @@ test(`omitting the password results in an error`, async () => {
 
   await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i)).then(() => console.log('Element no longer in DOM')).catch((err) => console.log(err))
 
-  expect(screen.getByRole(/alert/g)).toHaveTextContent('password required');
+  expect(screen.getByRole('alert').textContent).toMatchInlineSnapshot('"password required"');
 })
