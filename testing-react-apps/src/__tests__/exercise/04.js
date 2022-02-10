@@ -29,17 +29,17 @@ test('submitting the form calls onSubmit with username and password', () => {
 
   const handleSubmit = jest.fn();
 
-    render(<Login onSubmit={handleSubmit}/>)
+  render(<Login onSubmit={handleSubmit}/>)
 
-    const {getByRole, getByLabelText} = screen;
+  const {getByRole, getByLabelText} = screen;
 
-    const usernameInput = getByLabelText(/username/gi);
-    const passwordInput = getByLabelText(/password/gi);
-    const submitBtn = getByRole('button', {name: /submit/gi})
+  const usernameInput = getByLabelText(/username/i);
+  const passwordInput = getByLabelText(/password/i);
+  const submitBtn = getByRole('button', {name: /submit/gi})
 
-    userEvent.type(usernameInput, username);
-    userEvent.type(passwordInput, password);
-    userEvent.click(submitBtn);
+  userEvent.type(usernameInput, username);
+  userEvent.type(passwordInput, password);
+  userEvent.click(submitBtn);
 
   expect(handleSubmit).toHaveBeenCalledWith({username, password});
   expect(handleSubmit).toHaveBeenCalledTimes(1);
