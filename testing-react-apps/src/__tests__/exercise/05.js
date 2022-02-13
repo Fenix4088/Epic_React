@@ -8,7 +8,7 @@ import {build, fake} from '@jackfranklin/test-data-bot'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
 import Login from '../../components/login-submission'
-import {handlers} from "../../test/server-handlers";
+import {handlers} from '../../test/server-handlers'
 
 const buildLoginForm = build({
   fields: {
@@ -38,11 +38,11 @@ const server = setupServer(...handlers)
 // 📜 https://mswjs.io/
 
 beforeAll(() => {
-  server.listen();
+  server.listen()
 })
 
 afterAll(() => {
-  server.close();
+  server.close()
 })
 
 test(`logging in displays the user's username`, async () => {
@@ -54,9 +54,11 @@ test(`logging in displays the user's username`, async () => {
 
   userEvent.click(screen.getByRole('button', {name: /submit/i}))
 
-  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i)).then(() => console.log('Element no longer in DOM')).catch((err) => console.log(err))
+  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
+    .then(() => console.log('Element no longer in DOM'))
+    .catch(err => console.log(err))
 
-  expect(screen.getByText(username)).toBeVisible();
+  expect(screen.getByText(username)).toBeVisible()
 })
 
 test(`omitting the password results in an error`, async () => {
@@ -67,21 +69,24 @@ test(`omitting the password results in an error`, async () => {
 
   userEvent.click(screen.getByRole('button', {name: /submit/i}))
 
-  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i)).then(() => console.log('Element no longer in DOM')).catch((err) => console.log(err))
+  await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
+    .then(() => console.log('Element no longer in DOM'))
+    .catch(err => console.log(err))
 
-  expect(screen.getByRole('alert').textContent).toMatchInlineSnapshot('"password required"');
+  expect(screen.getByRole('alert').textContent).toMatchInlineSnapshot(
+    `"password required"`,
+  )
 })
-
 
 test('unknown server error displays the error message', async () => {
   const testErrorMessage = 'Oh no, something bad happened'
   server.use(
-      rest.post(
-          'https://auth-provider.example.com/api/login',
-          async (req, res, ctx) => {
-            return res(ctx.status(500), ctx.json({message: testErrorMessage}))
-          },
-      ),
+    rest.post(
+      'https://auth-provider.example.com/api/login',
+      async (req, res, ctx) => {
+        return res(ctx.status(500), ctx.json({message: testErrorMessage}))
+      },
+    ),
   )
   render(<Login />)
   userEvent.click(screen.getByRole('button', {name: /submit/i}))
