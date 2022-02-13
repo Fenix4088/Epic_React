@@ -16,10 +16,10 @@ function App() {
   )
 }
 
-function ThemeToggler() {
+export function ThemeToggler() {
   const [theme, setTheme] = useTheme()
   return (
-    <button onClick={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}>
+    <button data-testid="change-theme-btn" onClick={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}>
       Toggle theme: {theme}
     </button>
   )
