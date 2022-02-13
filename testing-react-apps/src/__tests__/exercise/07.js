@@ -8,9 +8,19 @@ import EasyButton from '../../components/easy-button'
 import userEvent from '@testing-library/user-event'
 import {ThemeToggler} from '../../examples/easy-button'
 
+const renderWithThemeProvider = (
+  Component = <></>,
+  providerProps = {initialTheme: 'light'},
+  options,
+) => {
+  const Wrapper = ({children}) => (
+    <ThemeProvider {...providerProps}>{children}</ThemeProvider>
+  )
+  return render(Component, {wrapper: Wrapper, ...options})
+}
+
 test('renders with the light styles for the light theme', () => {
-  const Wrapper = ({children}) => <ThemeProvider>{children}</ThemeProvider>
-  render(<EasyButton>Easy</EasyButton>, {wrapper: Wrapper})
+  renderWithThemeProvider(<EasyButton>Easy!</EasyButton>)
 
   const button = screen.getByRole('button', {name: /easy/i})
   expect(button).toHaveStyle(`
@@ -20,11 +30,9 @@ test('renders with the light styles for the light theme', () => {
 })
 
 test('renders with the dark styles for the dark theme', () => {
-  const Wrapper = ({children}) => (
-    <ThemeProvider initialTheme={'dark'}>{children}</ThemeProvider>
-  )
-
-  render(<EasyButton>Easy</EasyButton>, {wrapper: Wrapper})
+  renderWithThemeProvider(<EasyButton>Easy!</EasyButton>, {
+    initialTheme: 'dark',
+  })
 
   const button = screen.getByRole('button', {name: /easy/i})
   expect(button).toHaveStyle(`
@@ -34,8 +42,7 @@ test('renders with the dark styles for the dark theme', () => {
 })
 
 test('integration test for `Hit the easy button!`', () => {
-  const Wrapper = ({children}) => <ThemeProvider>{children}</ThemeProvider>
-  render(
+  renderWithThemeProvider(
     <>
       <h1>Hit the easy button!</h1>
       <hr />
@@ -43,7 +50,6 @@ test('integration test for `Hit the easy button!`', () => {
       <hr />
       <ThemeToggler />
     </>,
-    {wrapper: Wrapper},
   )
 
   const button = screen.getByRole('button', {name: /easy/i})
