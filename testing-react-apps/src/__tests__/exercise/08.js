@@ -2,7 +2,7 @@
 // http://localhost:3000/counter-hook
 
 import * as React from 'react'
-import {render, screen} from '@testing-library/react'
+import {act, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import useCounter from '../../components/use-counter'
 
@@ -20,9 +20,8 @@ import useCounter from '../../components/use-counter'
 }
 
 test('exposes the count and increment/decrement functions', () => {
-  // 🐨 render the component
     render(<UseCounterHookExample/>)
-    const {getByText, getAllByRole, debug} = screen;
+    const {getByText} = screen;
     const message = getByText(/Current count: \d+$/i);
     // const [dec, inc] = getAllByRole('button');
     const inc = screen.getByRole('button', {name: /increment/i})
@@ -35,5 +34,29 @@ test('exposes the count and increment/decrement functions', () => {
     expect(message).toHaveTextContent('Current count: 0');
 
 })
+
+let result;
+const UseCounterHookExampleWithoutJSX = () => {
+    result = useCounter();
+
+    return null
+}
+
+it('exposes the count and increment/decrement functions (without JSX)', () => {
+    let result;
+    const UseCounterHookExampleWithoutJSX = () => {
+        result = useCounter();
+
+        return null
+    }
+    render(<UseCounterHookExampleWithoutJSX/>)
+
+    expect(result.count).toBe(0);
+    act(() => result.increment())
+    expect(result.count).toBe(1);
+    act(() => result.decrement())
+    expect(result.count).toBe(0);
+
+});
 
 /* eslint no-unused-vars:0 */
