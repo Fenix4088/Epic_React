@@ -1,5 +1,5 @@
-// Render as you fetch
-// http://localhost:3000/isolated/exercise/02.js
+// Refactor useEffect to Suspense
+// http://localhost:3000/isolated/final/02.js
 
 import * as React from 'react'
 import {
@@ -7,54 +7,70 @@ import {
   PokemonInfoFallback,
   PokemonForm,
   PokemonDataView,
-  PokemonErrorBoundary
+  PokemonErrorBoundary,
 } from '../pokemon'
-import {createResource} from '../utils';
-
+import {createResource} from '../utils'
 
 function PokemonInfo({pokemonResource}) {
-    const pokemon = pokemonResource.read();
-    return (
-      <div>
-        <div className="pokemon-info__img-wrapper">
-          <img src={pokemon.image} alt={pokemon.name} />
-        </div>
-        <PokemonDataView pokemon={pokemon} />
+  const pokemon = pokemonResource.read()
+  return (
+    <div>
+      <div className="pokemon-info__img-wrapper">
+        <img src={pokemon.image} alt={pokemon.name} />
       </div>
-    )
+      <PokemonDataView pokemon={pokemon} />
+    </div>
+  )
+}
+
+function createPokemonResource(pokemonName) {
+  return createResource(fetchPokemon(pokemonName))
 }
 
 function App() {
   const [pokemonName, setPokemonName] = React.useState('')
-  const [pokemonResource, setPokemonResource] = React.useState(null);
+  const [pokemonResource, setPokemonResource] = React.useState(null)
 
   React.useEffect(() => {
-    if(!pokemonName) {
-      setPokemonResource(null);
-      return;
+    if (!pokemonName) {
+      setPokemonResource(null)
+      return
     }
-    setPokemonResource(createResource(fetchPokemon(pokemonName)))
+    setPokemonResource(createPokemonResource(pokemonName))
   }, [pokemonName])
 
   function handleSubmit(newPokemonName) {
     setPokemonName(newPokemonName)
   }
 
+  function handleReset() {
+    setPokemonName('')
+  }
+
   return (
     <div className="pokemon-info-app">
       <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit} />
       <hr />
-      <div className="pokemon-info">
-        {pokemonResource ? (
-            <PokemonErrorBoundary onReset={() => setPokemonName('')}>
-              <React.Suspense fallback={<PokemonInfoFallback name={pokemonName}/>}>
-                <PokemonInfo pokemonResource={pokemonResource} />
-              </React.Suspense>
+      <React.Suspense
+        fallback={
+          <div className="pokemon-info">
+            <PokemonInfoFallback name={pokemonName} />
+          </div>
+        }
+      >
+        <div className="pokemon-info">
+          {pokemonResource ? (
+            <PokemonErrorBoundary
+              onReset={handleReset}
+              resetKeys={[pokemonName]}
+            >
+              <PokemonInfo pokemonResource={pokemonResource} />
             </PokemonErrorBoundary>
-        ) : (
-          'Submit a pokemon'
-        )}
-      </div>
+          ) : (
+            'Submit a pokemon'
+          )}
+        </div>
+      </React.Suspense>
     </div>
   )
 }
