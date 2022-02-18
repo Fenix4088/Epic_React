@@ -24,7 +24,9 @@ function PokemonInfo({pokemonResource}) {
 }
 
 const SUSPENSE_CONFIG = {
-  timeoutMs: 3000
+  timeoutMs: 4000,
+  busyDelayMs: 300,
+  busyMinDurationMs: 700,
 }
 
 function createPokemonResource(pokemonName) {
@@ -41,7 +43,7 @@ function createPokemonResource(pokemonName) {
 
   // shows busy indicator for a split second
   // 💯 this is what the extra credit improves
-  // delay = 200
+  delay = 350
   return createResource(fetchPokemon(pokemonName, delay))
 }
 
